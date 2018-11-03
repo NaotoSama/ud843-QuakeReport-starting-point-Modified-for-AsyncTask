@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout for a list of earthquakes 這個佈局的目的是純粹導入ListView功能，
+讓EarthquakeActivity Class透過Adapter(調度器)的仲介，把畫面顯示在這個ListView上-->
+
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:divider="@null"
+    android:dividerHeight="0dp"/>
+    <!-- Set android:divider to be “@null” and android:dividerHeight to be “0dp”
+         to hide the divider between list items-->

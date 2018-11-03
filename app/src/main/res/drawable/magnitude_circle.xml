@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 在此佈局中定義震度的背景色塊的形狀和顏色，並將此布局在自定義的排版佈局中設置為震度TextView的背景
+     Background circle for the magnitude value
+     By defining the circle shape in XML,
+     we create a single flexible asset that will scale across devices instead of including multiple image assets from our designer.
+     We can also manipulate the color from Java code, further reducing the number of required assets.
+     Fewer image files in our project means the size of our app will be smaller, which is better for the end user-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/magnitude1" />
+    <size
+        android:width="36dp"
+        android:height="36dp" />
+    <corners android:radius="18dp" />
+</shape>
