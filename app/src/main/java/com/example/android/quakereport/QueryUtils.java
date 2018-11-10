@@ -83,7 +83,7 @@ public final class QueryUtils {
     private static String makeHttpRequest(URL url) throws IOException {   //建立連線可能會有連線失敗(回傳碼非200)的狀況，所以要丟出IOException來封裝錯誤訊息以免App當掉
         String jsonResponse = "";  //宣告jsonResponse字符並初始化為空白文字
 
-        // If the URL is null, then return early. 若沒有網址，就別浪費時間執行下面的程式碼的，直接提交上面初始化的空白文字出來
+        // If the URL is null, then return early. 若沒有網址，就別浪費時間執行下面的程式碼，直接提交上面初始化的空白文字出來
         if (url == null) {
             return jsonResponse;
         }
