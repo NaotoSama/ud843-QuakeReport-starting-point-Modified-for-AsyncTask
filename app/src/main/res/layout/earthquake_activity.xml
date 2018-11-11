@@ -1,13 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Layout for a list of earthquakes 這個佈局的目的是純粹導入ListView功能，
-讓EarthquakeActivity Class透過Adapter(調度器)的仲介，把畫面顯示在這個ListView上-->
 
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/list"
-    android:orientation="vertical"
+<!-- In order to show the empty view, we modify the earthquake_activity layout.
+Instead of a single ListView, we add a parent RelativeLayout, because it allows children views to overlap each other.
+The first child is the ListView, with width/height match parent, to take up the full screen.
+The second child is a TextView, which will be the empty view. The TextView has height and width wrap_content,
+and we center it vertically and horizontally within the parent with the attribute  “android:layout_centerInParent = "true" ”-->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:divider="@null"
-    android:dividerHeight="0dp"/>
-    <!-- Set android:divider to be “@null” and android:dividerHeight to be “0dp”
-         to hide the divider between list items-->
+    android:layout_height="match_parent">
+
+    <!-- Layout for a list of earthquakes 這個佈局的目的是純粹導入ListView功能，
+    讓EarthquakeActivity Class透過Adapter(調度器)的仲介，把畫面顯示在這個ListView上-->
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/list"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:dividerHeight="0dp"/>
+        <!-- Set android:divider to be “@null” and android:dividerHeight to be “0dp”
+             to hide the divider between list items-->
+
+
+    <!-- Empty view is only visible when the list has no items. -->
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textAppearance="?android:textAppearanceMedium"/>
+
+</RelativeLayout>

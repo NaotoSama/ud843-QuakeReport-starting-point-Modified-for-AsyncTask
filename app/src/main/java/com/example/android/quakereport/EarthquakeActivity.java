@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     /** URL for earthquake data from the USGS dataset */
     private static final String USGS_REQUEST_URL =
-            "http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=6&limit=10";
+            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=6&limit=10";
 
     /**
      * Constant value for the earthquake loader ID. We can choose any integer.
@@ -33,6 +34,9 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     /** Adapter for the list of earthquakes */
     private EarthquakeAdapter mAdapter;
+
+    /** TextView that is displayed when the list is empty */
+    private TextView mEmptyStateTextView;
 
 
     @Override
@@ -70,6 +74,13 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         });
 
 
+        /** Now we need to hook up the empty view to the ListView. We can use the ListView setEmptyView() method.
+         *  We can also make the empty state TextView be a global variable (在上面), so we can refer to it in a later method.
+         *  The TextView class was also automatically imported into the java file, as soon as we used that class. */
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+        earthquakeListView.setEmptyView(mEmptyStateTextView);
+
+
         /**To retrieve an earthquake, we need to get the loader manager and tell the loader manager to initialize the loader with the specified ID,
          * the second argument allows us to pass a bundle of additional information, which we'll skip.
          * The third argument is what object should receive the LoaderCallbacks (and therefore, the data when the load is complete!) - which will be this activity.
@@ -96,6 +107,12 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     //We need onLoadFinished(), where we'll do exactly what we did in onPostExecute(), and use the earthquake data to update our UI - by updating the dataset in the adapter.
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
+
+        /** To avoid the “No earthquakes found.” message blinking on the screen when the app first launches, we can leave the empty state TextView blank,
+         *  until the first load completes. In the onLoadFinished callback method, we can set the text to be the string “No earthquakes found.” */
+        // Set empty state text to display "No earthquakes found."
+        mEmptyStateTextView.setText(R.string.no_earthquakes);
+
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
 
