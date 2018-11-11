@@ -2,8 +2,11 @@ package com.example.android.quakereport;
 
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -39,13 +42,28 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     private TextView mEmptyStateTextView;
 
 
+
+    /** 以下的App運作流程: (1) 將ListView對接和EmptyView、Adapter和OnItemClickListener
+     *                   (2) 檢查網路狀態為連線或斷線==>用if/else statement設置Loader以及斷線時的錯誤訊息。確定有連線時再加載loader來抓數據，若斷線則顯示斷線的錯誤訊息。此外，因為佈局中有添加"加載中"的符號(loading indicator)，所以要讓App在斷線時隱藏"加載中"的符號
+     *                   (3) 跑Loader的3個子方法(onCreateLoader、onLoadFinished、onLoaderReset)==>在Loader加載完(onLoadFinished)的階段設置無數據可加載時的錯誤訊息。此外，因為佈局中有添加"加載中"的符號，所以要讓App在加載器加載完數據後隱藏"加載中"的符號。
+     *                   (4) 在onLoadFinished階段設置清除舊數據並更新ListView的數據(若有數據可加載的話)
+     *                   (5) 在onLoadReset階段設置清除數據，以免用戶重回到App畫面時看到舊的內容
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+
         // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
+
+        /** Now we need to hook up the empty view to the ListView. We can use the ListView setEmptyView() method.
+         *  We can also make the empty state TextView be a global variable (在上面), so we can refer to it in a later method.
+         *  The TextView class was also automatically imported into the java file, as soon as we used that class. */
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+        earthquakeListView.setEmptyView(mEmptyStateTextView);
 
         // Create a new adapter that takes an empty list of earthquakes as input
         mAdapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
@@ -74,25 +92,42 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         });
 
 
-        /** Now we need to hook up the empty view to the ListView. We can use the ListView setEmptyView() method.
-         *  We can also make the empty state TextView be a global variable (在上面), so we can refer to it in a later method.
-         *  The TextView class was also automatically imported into the java file, as soon as we used that class. */
-        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
-        earthquakeListView.setEmptyView(mEmptyStateTextView);
+        /** 在這裡設置檢查網路連線狀態，若有連線則加載loader並獲取數據，若斷線則在App畫面顯示錯誤訊息*/
+        // Get a reference to the ConnectivityManager to check the state of network connectivity
+        //透過ConnectivityManager檢查連網狀態(有連線/斷線)
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        // Get details on the currently active default data network
+        // 取得網路狀態為連線或斷線
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-        /**To retrieve an earthquake, we need to get the loader manager and tell the loader manager to initialize the loader with the specified ID,
-         * the second argument allows us to pass a bundle of additional information, which we'll skip.
-         * The third argument is what object should receive the LoaderCallbacks (and therefore, the data when the load is complete!) - which will be this activity.
-         * This code goes inside the onCreate() method of the EarthquakeActivity, so that the loader can be initialized as soon as the app opens.
-         */
-        // Get a reference to the LoaderManager, in order to interact with loaders.
-        LoaderManager loaderManager = getLoaderManager();
+        // If there is a network connection, fetch data
+        // 若有連線，則透過getLoaderManager()開始加載loader並加載數據
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // Get a reference to the LoaderManager, in order to interact with loaders.
+            LoaderManager loaderManager = getLoaderManager();
 
-        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-        // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-        // because this activity implements the LoaderCallbacks interface).
-        loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+            // 初始化loader
+            // To retrieve an earthquake, we need to get the loader manager and tell the loader manager to initialize the loader with the specified ID,
+            // the second argument allows us to pass a bundle of additional information, which we'll skip.
+            // The third argument is what object should receive the LoaderCallbacks (and therefore, the data when the load is complete!)
+            // - which will be this activity because this activity implements the LoaderCallbacks interface.
+            // This code goes inside the onCreate() method of the EarthquakeActivity, so that the loader can be initialized as soon as the app opens.
+            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+
+        // 若斷線，則顯示錯誤訊息
+        // Otherwise, display error
+        // First, hide loading indicator so error message will be visible
+        } else {
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.GONE);  //我們有在佈局中添加"加載中"的符號(loading indicator)，所以要讓App在斷線時隱藏"加載中"的符號，否則該符號會跟下面的錯誤訊息重疊出現在畫面上。
+
+            // Set empty state text to display no connection error message when there is no Internet connection.
+            //斷線時的錯誤訊息
+            mEmptyStateTextView.setText(R.string.no_internet_connection);
+        }
+
     }
 
 
@@ -108,13 +143,24 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
 
+        /** Hide the loading indicator (by setting visibility to View.GONE) after the first load is completed - when onLoadFinished() is called.
+         * 我們有在佈局中添加"加載中"的符號(loading indicator)，所以要讓App在加載器加載完數據後隱藏"加載中"的符號。
+         * 在程序跑到onLoadFinished之前，加載符號會一直顯示*/
+        // Hide loading indicator because the data has been loaded.
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.GONE);
+
+
         /** To avoid the “No earthquakes found.” message blinking on the screen when the app first launches, we can leave the empty state TextView blank,
          *  until the first load completes. In the onLoadFinished callback method, we can set the text to be the string “No earthquakes found.” */
-        // Set empty state text to display "No earthquakes found."
+        // Set empty state text to display "No earthquakes found." when there is no data available to fetch.
+        // 無數據可加載時會自動顯示的錯誤訊息。(EmptyView有一套自動化機制，若有下載到數據則會隱藏EmptyView並自動顯示ListView的內容，若無數據則隱藏ListView並顯示EmptyView)
         mEmptyStateTextView.setText(R.string.no_earthquakes);
+
 
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
+
 
         // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
         // data set. This will trigger the ListView to update.

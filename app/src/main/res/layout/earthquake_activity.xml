@@ -24,12 +24,26 @@ and we center it vertically and horizontally within the parent with the attribut
              to hide the divider between list items-->
 
 
-    <!-- Empty view is only visible when the list has no items. -->
+    <!-- Empty view is only visible when the list has no items.
+    The height and width are set as “wrap_content” and the view is centered in the middle of the screen.-->
     <TextView
         android:id="@+id/empty_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textAppearance="?android:textAppearanceMedium"/>
+
+
+    <!-- Loading indicator is only shown before the first load.
+     Add the view as the last child of the RelativeLayout, so that it would appear on top of the other children views.
+     The height and width are set as “wrap_content” and the view is centered in the middle of the screen.
+     The style “@style/Widget.AppCompat.ProgressBar” makes the ProgressBar appear as a circular loading indicator.-->
+    <ProgressBar
+        android:id="@+id/loading_indicator"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+
 
 </RelativeLayout>
