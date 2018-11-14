@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- We need to create the resource that defines what types of preference editing "widgets" our Settings screen should display.
+Create a settings_main.xml file in the res/xml directory, with the following contents -->
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_title">
+
+    <!-- EditTextPreference的功能是可編輯本文
+     "inputType="numberDecimal""意思是輸入的文字類型是帶小數點的浮點格式
+     "android:selectAllOnFocus"意思是預設全選文字反白-->
+    <EditTextPreference
+        android:defaultValue="@string/settings_min_magnitude_default"
+        android:inputType="numberDecimal"
+        android:key="@string/settings_min_magnitude_key"
+        android:selectAllOnFocus="true"
+        android:title="@string/settings_min_magnitude_label" />
+
+</PreferenceScreen>
+
+<!-- PreferenceScreen的選項有非常多，包含：
+1.CheckBoxPreference：核取方塊
+2.EditTextPreference：可編輯本文
+3.ListPreference：單選清單
+4.MultiSelectListPreference：多選清單
+5.SwitchPreference：開關
+6.RingtonePreference：鈴聲設定
+7.PreferenceCategory則是代表偏好類別的意思，例如設定是樹狀一層一層的 -->

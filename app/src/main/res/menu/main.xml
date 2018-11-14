@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 這是在App右上方settings按鈕的佈局檔，會與MainActivity的onCreateOptionsMenu對接
+It would clutter up our EarthquakeActivity if we put a big SETTINGS button above or below our list of earthquakes.
+A much better place for that button to live is inside the app bar on the top of the EarthquakeActivity. -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.android.quakereport.EarthquakeActivity">
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/settings_menu_item"
+        android:icon="@drawable/ic_filter"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom" />
+        <!--orderInCategory表示的是item的排序，可以調整menu內的順序, 數字越小的在越前面
+        app:showAsAction表示項目要顯示或摺疊收起，「設定」我們用ifRoom表示只要畫面有空間就顯示，因此我們也給它一個Icon這樣顯示時比較好看。
+        若要摺疊(不顯示)的話就把"ifRoom"改成"Never"，改成"Never"就會被塞進settings內-->
+
+</menu>

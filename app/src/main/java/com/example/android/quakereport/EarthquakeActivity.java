@@ -10,6 +10,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -176,4 +178,25 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         // Loader reset, so we can clear out our existing data.
         mAdapter.clear();
     }
+
+
+    /** Override a couple methods to inflate the settings menu, and respond when users click on our menu item
+     * 在MainActivity中用onCreateOptionsMenu建立選單，並用onOptionItemSelected來控制點擊事件 */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {  //這個方法是要用來生成選單頁面
+        getMenuInflater().inflate(R.menu.main, menu); // 設置要用哪個menu檔做為選單
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {  //這個方法是要設置用戶在主畫面單擊「settings」鈕時跳轉到「settings」頁面
+        int id = item.getItemId();  // 取得點選項目的id
+        if (id == R.id.action_settings) {  // 依照id判斷點了哪個項目並做相應事件
+            Intent settingsIntent = new Intent(this, SettingsActivity.class); //按下「settings」鈕要做的事：把畫面從EarthquakeActivity跳轉到SettingsActivity
+            startActivity(settingsIntent);  //開始上述的動作
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
