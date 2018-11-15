@@ -7,8 +7,11 @@ Create a settings_main.xml file in the res/xml directory, with the following con
     android:title="@string/settings_title">
 
     <!-- EditTextPreference的功能是可編輯本文
+     "android:defaultValue"是輸入區的預設值，目前預設為6，若用戶有輸入新的數字，系統就會儲存新數字為新的預設值，下此開啟App時也會顯示新的預設值。
      "inputType="numberDecimal""意思是輸入的文字類型是帶小數點的浮點格式
-     "android:selectAllOnFocus"意思是預設全選文字反白-->
+     "android:key"是設定的佈局中某個項目的識別key
+     "android:selectAllOnFocus"意思是預設全選文字反白
+     "android:title"是某個項目的顯示名稱-->
     <EditTextPreference
         android:defaultValue="@string/settings_min_magnitude_default"
         android:inputType="numberDecimal"

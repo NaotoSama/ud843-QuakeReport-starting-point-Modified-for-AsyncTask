@@ -5,10 +5,12 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,9 +28,11 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     private static final String LOG_TAG = EarthquakeActivity.class.getName();
 
-    /** URL for earthquake data from the USGS dataset */
+    /** URL (for earthquake data from the USGS dataset) modified to the base URI.
+     * Later we’ll use UriBuilder.appendQueryParameter() methods to add additional parameters to the URI
+     * (such as JSON response format, 10 earthquakes requested, minimum magnitude value, and sort order). */
     private static final String USGS_REQUEST_URL =
-            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=6&limit=10";
+            "https://earthquake.usgs.gov/fdsnws/event/1/query";
 
     /**
      * Constant value for the earthquake loader ID. We can choose any integer.
@@ -137,8 +141,24 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     //We need onCreateLoader(), for when the LoaderManager has determined that the loader with our specified ID isn't running, so we should create a new one.
     @Override
     public Loader<List<Earthquake>> onCreateLoader(int i, Bundle bundle) {
-        // Create a new loader for the given URL
-        return new EarthquakeLoader(this, USGS_REQUEST_URL);
+        //Read the user’s latest preferences for the minimum magnitude, construct a proper URI with their preference,
+        //and then create a new Loader for that URI.
+        //每個Preference都有一個相應的鍵值對，可供系統用來將設置保存在應用設置的默認SharedPreferences文件中。
+        //當用戶更改設置時，系統會自動更新SharedPreferences文件中的相應值。
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this); //透過PreferenceManager叫系統抓各設定項目的資料，將各設定項目命名為sharedPrefs
+        String minMagnitude = sharedPrefs.getString(                  //抓設定項目裡的字符，將該字符命名為minMagnitude，該字符就會儲存下面兩個元素：設定項目的識別key和預設數值
+                getString(R.string.settings_min_magnitude_key),       //取得設定項目的識別key (需要取得Key是為了要讓系統知道是抓哪個項目key下的數值)
+                getString(R.string.settings_min_magnitude_default));  //取得預設數值(若用戶有輸入新的數值，系統就會抓到新的數值)
+        Uri baseUri = Uri.parse(USGS_REQUEST_URL);                    //導入URI化的網址(USGS_REQUEST_URL)並解析，將解析到的URI網址命名為baseUri
+        Uri.Builder uriBuilder = baseUri.buildUpon();                 //對URI網址導入Uri.Builder方法，準備將其他的用戶設定值添加在URI後面，把等待添加的URI網址命名為uriBuilder，
+
+        uriBuilder.appendQueryParameter("format", "geojson");         //在URI後面添加搜尋參數字符"format"(格式為geojson)
+        uriBuilder.appendQueryParameter("limit", "10");               //在URI後面添加搜尋參數"limit"(限制為10個搜尋結果)
+        uriBuilder.appendQueryParameter("minmag", minMagnitude);      //在URI後面添加搜尋參數"minmag"(預設震度的數值，若用戶有輸入新的數值，系統就會抓到新的數值)
+        uriBuilder.appendQueryParameter("orderby", "time");           //在URI後面添加搜尋參數"orderby"(以時間排序)
+                                                                      //(註:原URL網址是"http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=6&limit=10")
+
+        return new EarthquakeLoader(this, uriBuilder.toString());  //透過toString把更新的URI網址(uriBuilder)轉換成字符，存到Loader中，提交出來
     }
 
     //We need onLoadFinished(), where we'll do exactly what we did in onPostExecute(), and use the earthquake data to update our UI - by updating the dataset in the adapter.
