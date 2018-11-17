@@ -25,7 +25,8 @@
 
     <!-- Below are Strings related to Settings -->
 
-    <!-- Strings For Minimum Magnitude Preference [CHAR LIMIT=30] -->
+    <!-- Strings For Minimum Magnitude Preference [CHAR LIMIT=30]
+    定義key和default value時，因為要保證唯一性，所以在 <string> 標籤內添加 translatable="false" 表示該字符串不可翻譯，應保持原樣。-->
     <string name="settings_min_magnitude_label">Minimum Magnitude</string>
     <string name="settings_min_magnitude_key" translatable="false">min_magnitude</string>
     <string name="settings_min_magnitude_default" translatable="false">6</string>
