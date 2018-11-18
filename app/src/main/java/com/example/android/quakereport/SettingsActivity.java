@@ -2,6 +2,7 @@ package com.example.android.quakereport;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -42,13 +43,38 @@ public class SettingsActivity extends AppCompatActivity {
             //在 onCreate 內透過 findPreference 找到偏好項並導入輔助方法(bindPreferenceSummaryToValue)
             Preference minMagnitude = findPreference(getString(R.string.settings_min_magnitude_key)); //透過 findPreference取得偏好項的識別key，找到minMagnitude這個偏好項的欄位
             bindPreferenceSummaryToValue(minMagnitude); // 叫bindPreferenceSummaryToValue輔助方法去套用到minMagnitude這個偏好項的欄位上
+
+
+            //we'll add additional logic in the EarthquakePreferenceFragment so that it is aware of the new ListPreference,
+            // similar to what we did for the EditTextPreference. In the onCreate() method of the fragment, find the “order by” Preference object according to its key.
+            // Then call the bindPreferenceSummaryToValue() helper method on this Preference object,
+            // which will set this fragment as the OnPreferenceChangeListener and update the summary so that it displays the current value stored in SharedPreferences.
+            Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
+            bindPreferenceSummaryToValue(orderBy);
         }
 
         @Override
         //在這裡將下面bindPreferenceSummaryToValue輔助方法傳入的偏好項的預設數值透過setSummary 顯示在偏好項標題的下方。
         public boolean onPreferenceChange(Preference preference, Object value) {  //宣告onPreferenceChange方法並導入兩個arguments:偏好項以及數值物件
             String stringValue = value.toString(); //onPreferenceChange已透過下面的bindPreferenceSummaryToValue輔助方法載入了監聽器監聽到的(用戶輸入的)預設數值，所以只須把數值(value)轉換成字符，並命名為stringValue
-            preference.setSummary(stringValue);  //透過setSummary把預設數值顯示在偏好項標題的下方。
+
+            // For list preferences, look up the correct display value in the preference's 'entries' list (since they have separate labels/values).
+            // instanceof 運算子是一個二元運算子，二元運作子接受兩個參數，通常是用來比較兩個參數間的關係。
+            //它的用法是這樣的：objectA instanceof ClassName，這是要測試某一物件 objectA 是否為某類別 (class)或其子類別 (subclass) 實例 (instance)，
+            //或是 objectA 是不是某介面 (interface) 的實作。當 objectA 屬於該 class (或其衍生類別) 的 instance 就會回傳 true；否則傳回 false。
+            //所以 instanceof 可以被用在繼承的關係中，需特別注意的是，比較時物件與類別間要有繼承關係，否則會有compile error。
+            if (preference instanceof ListPreference) {
+                ListPreference listPreference = (ListPreference) preference; //把preference強制轉化為ListPreference類型
+                int prefIndex = listPreference.findIndexOfValue(stringValue); //獲取ListPreference中的實體內容的下標值
+                if (prefIndex >= 0) {
+                    CharSequence[] labels = listPreference.getEntries(); //獲取ListPreference中的實體內容
+                    preference.setSummary(labels[prefIndex]);
+                }
+
+            // For other preferences, set the summary to the value's simple string representation.
+            } else {
+                preference.setSummary(stringValue); //透過setSummary把預設數值顯示在偏好項標題的下方。
+            }
             return true;
         }
 

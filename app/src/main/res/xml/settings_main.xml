@@ -6,6 +6,17 @@ Create a settings_main.xml file in the res/xml directory, with the following con
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/settings_title">
 
+
+    <!-- android：entries是展現給用戶在實際畫面看到的下拉列表(The human-readable array to present as a list)
+         android：entryValues是列表中各個元素被選擇後存儲到手機中的值。簡單的說就是數據庫中的值(The array to find the value to save for a preference when an entry is selected.)-->
+    <ListPreference
+        android:defaultValue="@string/settings_order_by_default"
+        android:entries="@array/settings_order_by_labels"
+        android:entryValues="@array/settings_order_by_values"
+        android:key="@string/settings_order_by_key"
+        android:title="@string/settings_order_by_label" />
+
+
     <!-- EditTextPreference的功能是可編輯本文
      "android:defaultValue"是輸入區的預設值，目前預設為6，若用戶有輸入新的數字，系統就會儲存新數字為新的預設值，下此開啟App時也會顯示新的預設值。
      "inputType="numberDecimal""意思是輸入的文字類型是帶小數點的浮點格式

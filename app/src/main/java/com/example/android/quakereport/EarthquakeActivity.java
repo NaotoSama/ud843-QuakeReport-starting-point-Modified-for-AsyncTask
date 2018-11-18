@@ -148,7 +148,13 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this); //透過PreferenceManager叫系統抓各設定項目的資料，將各設定項目命名為sharedPrefs
         String minMagnitude = sharedPrefs.getString(                  //抓設定項目裡的字符，將該字符命名為minMagnitude，該字符就會儲存下面兩個元素：設定項目的識別key和預設數值
                 getString(R.string.settings_min_magnitude_key),       //取得設定項目的識別key (需要取得Key是為了要讓系統知道是抓哪個項目key下的數值)
-                getString(R.string.settings_min_magnitude_default));  //取得預設數值(若用戶有輸入新的數值，系統就會抓到新的數值)
+                getString(R.string.settings_min_magnitude_default));  //取得震度的預設數值(若用戶有輸入新的數值，系統就會抓到新的數值)
+
+        String orderBy = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),            //Read from SharedPreferences and check for the value associated with the key
+                getString(R.string.settings_order_by_default)         //When building the URI and appending query parameters, instead of hardcoding the “orderby” parameter to be “time”, we will use the user’s preference (stored in the orderBy variable).
+        );
+
         Uri baseUri = Uri.parse(USGS_REQUEST_URL);                    //導入URI化的網址(USGS_REQUEST_URL)並解析，將解析到的URI網址命名為baseUri
         Uri.Builder uriBuilder = baseUri.buildUpon();                 //對URI網址導入Uri.Builder方法，準備將其他的用戶設定值添加在URI後面，把等待添加的URI網址命名為uriBuilder，
 
